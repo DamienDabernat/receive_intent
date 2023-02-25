@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
+import android.nfc.NfcAdapter
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
@@ -100,7 +103,7 @@ fun wrap(o: Any?): Any? {
             return o.toString()
         }
     } catch (e: Exception) {
-        //Log.e("ReceiveIntentPlugin", e.message, e)
+        Log.e("ReceiveIntentPlugin", e.message, e)
     }
     return null
 }
@@ -164,6 +167,8 @@ fun getApplicationSignature(context: Context, packageName: String): List<String>
     return emptyList()
 }
 
+//fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
+
 fun bytesToHex(bytes: ByteArray): String {
     val hexArray = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F')
     val hexChars = CharArray(bytes.size * 2)
@@ -174,4 +179,24 @@ fun bytesToHex(bytes: ByteArray): String {
         hexChars[j * 2 + 1] = hexArray[v and 0x0F]
     }
     return String(hexChars)
+}
+
+fun getNdefData(intent: Intent): JSONObject {
+    val ndefId = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID)?.let { bytesId ->
+         bytesToHex(bytesId)
+    }
+
+    var ndefTextPlainData : String? = null
+    val optRawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+    optRawMsgs?.let { rawMsgs ->
+        if(rawMsgs[0] is NdefMessage) {
+            val record: NdefRecord = (rawMsgs[0] as NdefMessage).records[0]
+            ndefTextPlainData = String(record.payload).trim()
+        }
+    }
+
+    val json = JSONObject()
+    json.put("id", ndefId)
+    json.put("data", ndefTextPlainData)
+    return json
 }

@@ -23,6 +23,7 @@ class Intent {
   final String? data;
   final List<String>? categories;
   final Map<String, dynamic>? extra;
+  final Map<String, dynamic>? ndef;
 
   bool get isNotNull => !isNull;
 
@@ -34,6 +35,7 @@ class Intent {
     this.data,
     this.categories,
     this.extra,
+    this.ndef
   });
 
   factory Intent.fromMap(Map? map) => Intent(
@@ -53,6 +55,10 @@ class Intent {
             ? (json.decode(map!["extra"]) as Map)
                 .map((key, value) => MapEntry(key.toString(), value))
             : null,
+        ndef: map?["ndef"] != null
+            ? (json.decode(map!["ndef"]) as Map)
+            .map((key, value) => MapEntry(key.toString(), value))
+            : null,
       );
 
   Map<String, dynamic> toMap() => {
@@ -62,6 +68,7 @@ class Intent {
         "data": data,
         "categories": categories,
         "extra": extra,
+        "ndef": ndef
       };
 
   @override
