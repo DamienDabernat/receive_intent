@@ -44,7 +44,7 @@ class ReceiveIntentPlugin : FlutterPlugin, MethodCallHandler, EventChannel.Strea
                 "data" to intent.dataString,
                 "categories" to intent.categories?.toList(),
                 "extra" to intent.extras?.let { bundleToJSON(it).toString() },
-                "ndef" to getNdefData(intent)
+                "ndef" to getNdefData(intent).toString()
         )
         //Log.e("ReceiveIntentPlugin", "intentMap: $intentMap")
         if (initialIntent) {
